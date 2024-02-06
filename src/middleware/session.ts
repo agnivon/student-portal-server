@@ -17,11 +17,14 @@ export default function sessionMiddleware(app: Express) {
       stringify: false,
       ttl: 14 * 24 * 60 * 60, // = 14 days
     }),
-    sameSite: "none",
-    path: "/",
-    httpOnly: true,
     saveUninitialized: true,
-    cookie: { secure: process.env.NODE_ENV !== "development" },
+    cookie: {
+      secure: process.env.NODE_ENV === "production",
+      sameSite:
+        process.env.NODE_ENV === "production" ? ("none" as const) : undefined,
+      path: "/",
+      httpOnly: true,
+    },
   };
   app.use(session(options));
 }

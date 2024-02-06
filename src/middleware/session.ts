@@ -17,8 +17,9 @@ export default function sessionMiddleware(app: Express) {
       stringify: false,
       ttl: 14 * 24 * 60 * 60, // = 14 days
     }),
+    sameSite: "none",
     saveUninitialized: true,
-    cookie: { secure: false },
+    cookie: { secure: process.env.NODE_ENV !== "development" },
   };
   app.use(session(options));
 }

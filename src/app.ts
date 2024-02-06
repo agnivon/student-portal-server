@@ -1,5 +1,4 @@
 import express from "express";
-import dotenv from "dotenv";
 import connect from "./clients/mongoose";
 import middleware from "./middleware";
 import routes from "./routes";
@@ -7,7 +6,9 @@ import FileClient from "./clients/file";
 import assert from "assert";
 import EmailClient from "./clients/email";
 
-dotenv.config();
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 const app = express();
 const port = process.env.PORT || 3000;
 

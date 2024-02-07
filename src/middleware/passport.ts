@@ -13,13 +13,13 @@ export default function passportMiddleware(app: Express) {
         const user = await User.findOne({ email: username }).lean();
         console.log(`User ${username} attempted to log in.`);
         if (!user) return done(null, false, { message: "Invalid email" });
-        if (!user.is_active)
-          return done(null, false, { message: "Inactive user" });
         if (!(await User.comparePassword(user.password || "", password))) {
           return done(null, false, {
             message: "Invalid password",
           });
         }
+        if (!user.is_active)
+          return done(null, false, { message: "Inactive user" });
         return done(null, user);
       } catch (err) {
         return done(err);

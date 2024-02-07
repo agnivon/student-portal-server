@@ -1,5 +1,4 @@
-import { from } from "form-data";
-import { optional, z } from "zod";
+import { z } from "zod";
 
 const firstNameSchema = z.string().max(64);
 const lastNameSchema = z.string().max(64);
@@ -60,6 +59,18 @@ export const ChangePasswordBodySchema = z
   .required({
     oldPassword: true,
     newPassword: true,
+  });
+
+export const ResetPasswordBodySchema = z
+  .object({
+    password: passwordSchema,
+    confirm: passwordSchema,
+    user_id: z.string(),
+  })
+  .required({
+    password: true,
+    confirm: true,
+    user_id: true,
   });
 
 export const NewPostBodySchema = z

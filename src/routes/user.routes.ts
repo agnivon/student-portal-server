@@ -12,6 +12,7 @@ import {
   CreateUserBodySchema,
   ForgotPasswordBodySchema,
   RegisterUserBodySchema,
+  ResetPasswordBodySchema,
   SendVerificationCodeBodySchema,
   UpdateUserProfileBodySchema,
 } from "../schema/validation/request_body";
@@ -200,6 +201,36 @@ userRouter.post("/change-password", ensureAuthenticated, async (req, res) => {
     return res.status(code).send(message);
   }
 });
+
+userRouter.put(
+  "/reset-password",
+  ensureAdminAuthenticated,
+  async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).send("Unauthorized");
+      const { password, confirm, user_id } = ResetPasswordBodySchema.parse(
+        req.body
+      );
+
+      if (password !== confirm)
+        return res.status(400).send("Passwords do not match");
+
+      const user = await User.findById(user_id);
+
+      if (user) {
+        user.password = password;
+        await user.save();
+        return res.status(204).send();
+      } else {
+        return res.status(401).send("User not found");
+      }
+    } catch (err) {
+      console.log(err);
+      const [code, message] = getErrorMessage(err);
+      return res.status(code).send(message);
+    }
+  }
+);
 
 userRouter.post("/send-verification-code", async (req, res) => {
   try {

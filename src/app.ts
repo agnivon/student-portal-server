@@ -1,10 +1,10 @@
+import assert from "assert";
 import express from "express";
+import EmailClient from "./clients/email";
+import FileClient from "./clients/file";
 import connect from "./clients/mongoose";
 import middleware from "./middleware";
 import routes from "./routes";
-import FileClient from "./clients/file";
-import assert from "assert";
-import EmailClient from "./clients/email";
 
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
@@ -60,6 +60,7 @@ connect(async (_mongoose) => {
 
     middleware(app);
     routes(app);
+
     app.get("/test", (_req, res) => {
       return res.status(200).send("OK");
     });

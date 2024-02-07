@@ -3,6 +3,7 @@ import { Express } from "express";
 import assert from "assert";
 import MongoStore from "connect-mongo";
 import mongoose from "mongoose";
+import { isProduction } from "../utils/env.utils";
 
 export default function sessionMiddleware(app: Express) {
   const secret = process.env.SESSION_SECRET;
@@ -20,12 +21,11 @@ export default function sessionMiddleware(app: Express) {
     }),
     saveUninitialized: true,
     cookie: {
-      secure: process.env.NODE_ENV === "production",
-      sameSite:
-        process.env.NODE_ENV === "production" ? ("none" as const) : undefined,
+      secure: isProduction(),
+      sameSite: isProduction() ? ("none" as const) : undefined,
       path: "/",
       httpOnly: true,
-      partitioned: true
+      partitioned: true,
     },
   };
   app.use(session(options));

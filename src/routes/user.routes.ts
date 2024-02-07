@@ -64,8 +64,13 @@ userRouter.post("/create", ensureAdminAuthenticated, async (req, res) => {
       ...rest,
       admin_id: req.user._id,
     });
+    const verification = await Verification.create({
+      user_id: newUser._id,
+      type: "registration",
+      expiryAt: new Date(+Date.now() + 15 * 24 * 60 * 60 * 1000), // 15 days from now
+    });
     emailClient.sendMail(
-      RegistrationEmail({ registrationCode: newUser._id.toString() }),
+      RegistrationEmail({ registrationCode: verification._id.toString() }),
       { to: email, from: EMAIL_FROM, subject: "Register on Student Portal" }
     );
     return res.json(newUser);
@@ -81,9 +86,25 @@ userRouter.post("/register", async (req, res) => {
     const { registration_id, password, ...formData } =
       RegisterUserBodySchema.parse(req.body);
 
+    const verification = await Verification.findOne({
+      _id: registration_id,
+      active: true,
+      expiryAt: { $gte: new Date() },
+      type: "registration",
+    }).sort({ createdAt: -1 });
+
+    if (!verification) return res.status(400).send("Verification code invalid");
+
+    verification.active = false;
+    await verification.save();
+
     const updatedUser = await User.findByIdAndUpdate(
-      registration_id,
-      { ...formData, password: await hashPassword(password), is_active: true },
+      verification.user_id,
+      {
+        ...formData,
+        password: await hashPassword(password),
+        is_active: true,
+      },
       {
         returnDocument: "after",
         select: {
@@ -239,7 +260,10 @@ userRouter.post("/send-verification-code", async (req, res) => {
     const user = await User.findOne({ email, is_active: true }).lean();
 
     if (user) {
-      const verification = await Verification.create({ user_id: user._id });
+      const verification = await Verification.create({
+        user_id: user._id,
+        type: "forgot-password",
+      });
       emailClient.sendMail(
         VerificationEmail({ verificationCode: verification._id.toString() }),
         {
@@ -270,20 +294,17 @@ userRouter.post("/forgot-password", async (req, res) => {
 
     const verification = await Verification.findOne({
       _id: verification_code,
+      user_id: user._id,
       active: true,
       expiryAt: { $gte: new Date() },
+      type: "forgot-password",
     }).sort({ createdAt: -1 });
 
-    console.log(!verification, verification?.user_id.equals(user._id));
-    console.log(verification?.user_id, user._id);
+    //console.log(!verification, verification?.user_id.equals(user._id));
+    //console.log(verification?.user_id, user._id);
 
-    if (!verification || !verification.user_id.equals(user._id)) {
-      if (verification) {
-        verification.active = false;
-        await verification.save();
-      }
-      return res.status(400).send("Verification code invalid");
-    }
+    if (!verification) return res.status(400).send("Verification code invalid");
+
     verification.active = false;
     user.password = password;
 

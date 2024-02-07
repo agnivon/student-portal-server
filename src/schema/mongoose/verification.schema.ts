@@ -20,6 +20,10 @@ const VerificationSchema = new Schema<
       type: Boolean,
       default: true,
     },
+    type: {
+      type: String,
+      default: null,
+    },
     expiryAt: {
       type: Date,
       default: function () {

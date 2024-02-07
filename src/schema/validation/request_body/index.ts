@@ -53,7 +53,7 @@ export const UpdateUserProfileBodySchema = z.object({
 
 export const ChangePasswordBodySchema = z
   .object({
-    oldPassword: passwordSchema,
+    oldPassword: z.string(),
     newPassword: passwordSchema,
   })
   .required({

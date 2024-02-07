@@ -25,6 +25,7 @@ export default function sessionMiddleware(app: Express) {
         process.env.NODE_ENV === "production" ? ("none" as const) : undefined,
       path: "/",
       httpOnly: true,
+      partitioned: true
     },
   };
   app.use(session(options));

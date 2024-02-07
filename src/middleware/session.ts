@@ -11,6 +11,7 @@ export default function sessionMiddleware(app: Express) {
     secret: process.env.SESSION_SECRET as string,
     resave: true,
     key: "express.sid",
+    unset: "destroy" as const,
     store: MongoStore.create({
       client: mongoose.connection.getClient(),
       collectionName: "sessions",

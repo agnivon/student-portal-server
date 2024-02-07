@@ -10,7 +10,7 @@ import {
   ensureAdminAuthenticated,
   ensureUserAuthenticated,
 } from "../utils/passport.utils";
-import { getErrorMessage } from "../utils/zod.utils";
+import { getErrorMessage } from "../utils/response.utils";
 
 const leaveRouter = express.Router();
 
@@ -85,10 +85,8 @@ leaveRouter.post("/apply", ensureUserAuthenticated, async (req, res) => {
     return res.json(newLeave);
   } catch (err) {
     console.log(err);
-    if (err instanceof ZodError) {
-      return res.status(400).send(getErrorMessage(err));
-    }
-    return res.status(500).send("Internal Server Error");
+    const [code, message] = getErrorMessage(err);
+    return res.status(code).send(message);
   }
 });
 
@@ -116,10 +114,8 @@ leaveRouter.post(
       }
     } catch (err) {
       console.log(err);
-      if (err instanceof ZodError) {
-        return res.status(400).send(getErrorMessage(err));
-      }
-      return res.status(500).send("Internal Server Error");
+      const [code, message] = getErrorMessage(err);
+      return res.status(code).send(message);
     }
   }
 );

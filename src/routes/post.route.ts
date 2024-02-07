@@ -6,7 +6,7 @@ import {
 import { Post } from "../models/mongoose";
 import { NewPostBodySchema } from "../schema/validation/request_body";
 import { ZodError } from "zod";
-import { getErrorMessage } from "../utils/zod.utils";
+import { getErrorMessage } from "../utils/response.utils";
 import { IUser } from "../types/user.types";
 import { IFile } from "../types/file.types";
 
@@ -27,7 +27,8 @@ postRouter.get("/all", ensureAuthenticated, async (req, res) => {
   } catch (err) {
     console.log(err);
 
-    return res.status(500).send("Internal Server Error");
+    const [code, message] = getErrorMessage(err);
+    return res.status(code).send(message);
   }
 });
 
@@ -49,10 +50,8 @@ postRouter.post("/create", ensureAdminAuthenticated, async (req, res) => {
     return res.json(newPost);
   } catch (err) {
     console.log(err);
-    if (err instanceof ZodError) {
-      return res.status(400).send(getErrorMessage(err));
-    }
-    return res.status(500).send("Internal Server Error");
+    const [code, message] = getErrorMessage(err);
+    return res.status(code).send(message);
   }
 });
 
@@ -68,7 +67,8 @@ postRouter.delete("/:id", ensureAdminAuthenticated, async (req, res) => {
     return res.json(deletedPost);
   } catch (err) {
     console.log(err);
-    return res.status(500).send("Internal Server Error");
+    const [code, message] = getErrorMessage(err);
+    return res.status(code).send(message);
   }
 });
 

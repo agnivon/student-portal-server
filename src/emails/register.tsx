@@ -41,7 +41,7 @@ export const RegistrationEmail = ({ registrationCode }: RegisterEmailProps) => (
           Your registration code for Student Portal
         </Heading>
         <Section style={buttonContainer}>
-          <Button style={button} href={`${clientHost}/login`}>
+          <Button style={button} href={`${clientHost}/register`}>
             Register on Student Portal
           </Button>
         </Section>

@@ -8,6 +8,7 @@ import {
   ensureAdminAuthenticated,
   ensureAuthenticated,
 } from "../utils/passport.utils";
+import { getErrorMessage } from "../utils/response.utils";
 
 const upload = multer(multerConfig);
 
@@ -36,10 +37,9 @@ fileRouter.post(
       }
     } catch (err) {
       console.log(err);
-      if (err instanceof AxiosError) {
-        console.log(err.response?.data);
-      }
-      return res.status(500).send("Internal Server Error");
+
+      const [code, message] = getErrorMessage(err);
+      return res.status(code).send(message);
     }
   }
 );
@@ -65,7 +65,8 @@ fileRouter.get("/:id", ensureAuthenticated, async (req, res) => {
     }
   } catch (err) {
     console.log(err);
-    return res.status(500).send("Internal Server Error");
+    const [code, message] = getErrorMessage(err);
+    return res.status(code).send(message);
   }
 });
 
@@ -80,7 +81,8 @@ fileRouter.delete("/:id", ensureAdminAuthenticated, async (req, res) => {
     return res.json(file);
   } catch (err) {
     console.log(err);
-    return res.status(500).send("Internal Server Error");
+    const [code, message] = getErrorMessage(err);
+    return res.status(code).send(message);
   }
 });
 

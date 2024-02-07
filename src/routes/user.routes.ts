@@ -1,11 +1,10 @@
-import { AxiosError } from "axios";
 import express from "express";
 import multer from "multer";
-import { ZodError } from "zod";
 import EmailClient from "../clients/email";
 import FileClient from "../clients/file";
 import multerConfig from "../config/multer";
 import RegistrationEmail from "../emails/register";
+import VerificationEmail from "../emails/verification";
 import { File, User, Verification } from "../models/mongoose";
 import {
   ChangePasswordBodySchema,
@@ -22,8 +21,7 @@ import {
   ensureAdminAuthenticated,
   ensureAuthenticated,
 } from "../utils/passport.utils";
-import { getErrorMessage } from "../utils/zod.utils";
-import VerificationEmail from "../emails/verification";
+import { getErrorMessage } from "../utils/response.utils";
 
 const EMAIL_FROM = process.env.EMAIL_FROM;
 
@@ -50,7 +48,8 @@ userRouter.get("/my-students", ensureAdminAuthenticated, async (req, res) => {
   } catch (err) {
     console.log(err);
 
-    return res.status(500).send("Internal Server Error");
+    const [code, message] = getErrorMessage(err);
+    return res.status(code).send(message);
   }
 });
 
@@ -71,10 +70,8 @@ userRouter.post("/create", ensureAdminAuthenticated, async (req, res) => {
     return res.json(newUser);
   } catch (err) {
     console.log(err);
-    if (err instanceof ZodError) {
-      return res.status(400).send(getErrorMessage(err));
-    }
-    return res.status(500).send("Internal Server Error");
+    const [code, message] = getErrorMessage(err);
+    return res.status(code).send(message);
   }
 });
 
@@ -96,10 +93,8 @@ userRouter.post("/register", async (req, res) => {
     return res.json(updatedUser);
   } catch (err) {
     console.log(err);
-    if (err instanceof ZodError) {
-      return res.status(400).send(getErrorMessage(err));
-    }
-    return res.status(500).send("Internal Server Error");
+    const [code, message] = getErrorMessage(err);
+    return res.status(code).send(message);
   }
 });
 
@@ -117,10 +112,8 @@ userRouter.put("/profile", ensureAuthenticated, async (req, res) => {
     return res.json(updatedUser);
   } catch (err) {
     console.log(err);
-    if (err instanceof ZodError) {
-      return res.status(400).send(getErrorMessage(err));
-    }
-    return res.status(500).send("Internal Server Error");
+    const [code, message] = getErrorMessage(err);
+    return res.status(code).send(message);
   }
 });
 
@@ -154,10 +147,8 @@ userRouter.put(
       }
     } catch (err) {
       console.log(err);
-      if (err instanceof AxiosError) {
-        console.log(err.response?.data);
-      }
-      return res.status(500).send("Internal Server Error");
+      const [code, message] = getErrorMessage(err);
+      return res.status(code).send(message);
     }
   }
 );
@@ -180,10 +171,8 @@ userRouter.put("/change-status", ensureAdminAuthenticated, async (req, res) => {
     return res.json(updatedUser);
   } catch (err) {
     console.log(err);
-    if (err instanceof ZodError) {
-      return res.status(400).send(getErrorMessage(err));
-    }
-    return res.status(500).send("Internal Server Error");
+    const [code, message] = getErrorMessage(err);
+    return res.status(code).send(message);
   }
 });
 
@@ -207,10 +196,8 @@ userRouter.post("/change-password", ensureAuthenticated, async (req, res) => {
     }
   } catch (err) {
     console.log(err);
-    if (err instanceof ZodError) {
-      return res.status(400).send(getErrorMessage(err));
-    }
-    return res.status(500).send("Internal Server Error");
+    const [code, message] = getErrorMessage(err);
+    return res.status(code).send(message);
   }
 });
 
@@ -236,10 +223,8 @@ userRouter.post("/send-verification-code", async (req, res) => {
     }
   } catch (err) {
     console.log(err);
-    if (err instanceof ZodError) {
-      return res.status(400).send(getErrorMessage(err));
-    }
-    return res.status(500).send("Internal Server Error");
+    const [code, message] = getErrorMessage(err);
+    return res.status(code).send(message);
   }
 });
 
@@ -277,10 +262,8 @@ userRouter.post("/forgot-password", async (req, res) => {
     return res.status(204).send();
   } catch (err) {
     console.log(err);
-    if (err instanceof ZodError) {
-      return res.status(400).send(getErrorMessage(err));
-    }
-    return res.status(500).send("Internal Server Error");
+    const [code, message] = getErrorMessage(err);
+    return res.status(code).send(message);
   }
 });
 

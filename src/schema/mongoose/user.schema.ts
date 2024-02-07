@@ -15,8 +15,8 @@ const UserSchema = new Schema<IUser, UserModel, IUserMethods>(
     },
     username: {
       type: String,
-      index: true,
-      unique: true,
+      //index: true,
+      //unique: true,
       default: null,
     },
     email: {

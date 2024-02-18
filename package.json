@@ -7,8 +7,14 @@
     "start": "ts-node -T src/app.ts",
     "dev": "nodemon --exec ts-node -T src/app.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "email-dev": "email dev --dir src/emails --port 4500"
+    "email-dev": "email dev --dir src/emails --port 4500",
+    "build": "rimraf dist && tsc",
+    "add-build": "git add dist"
   },
+  "pre-commit": [
+    "build",
+    "add-build"
+  ],
   "author": "Agnivo Neogi",
   "license": "ISC",
   "dependencies": {
@@ -31,6 +37,7 @@
     "passport-local": "^1.0.0",
     "react": "^18.2.0",
     "react-email": "^2.0.0",
+    "rimraf": "^5.0.5",
     "ts-node": "^10.9.2",
     "zod": "^3.22.4"
   },
@@ -46,6 +53,7 @@
     "@types/nodemailer": "^6.4.14",
     "@types/passport": "^1.0.16",
     "@types/passport-local": "^1.0.38",
+    "pre-commit": "^1.2.2",
     "typescript": "^5.3.3"
   }
 }
